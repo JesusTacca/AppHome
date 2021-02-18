@@ -1,0 +1,23 @@
+CREATE TABLE usuario(
+    id integer PRIMARY KEY AUTOINCREMENT, 
+    name text, 
+    surname text, 
+    DNI integer, 
+    money real,
+    email text
+);
+|
+CREATE TABLE home(
+    id integer PRIMARY KEY AUTOINCREMENT,
+    money real
+);
+|
+CREATE TABLE payment(
+    id integer PRIMARY KEY AUTOINCREMENT,
+    id_usuario integer,
+    id_home integer,
+    pay real,
+    motivo text,
+    FOREIGN KEY (id_usuario) REFERENCES usuario (id),
+    FOREIGN KEY (id_home) REFERENCES home (id)
+)
