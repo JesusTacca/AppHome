@@ -4,7 +4,10 @@ CREATE TABLE usuario(
     surname text, 
     DNI integer, 
     money real,
-    email text
+    email text,
+    fecha_nacimiento text,
+    numero integer,
+    contrasena text
 );
 |
 CREATE TABLE home(
@@ -20,4 +23,4 @@ CREATE TABLE payment(
     motivo text,
     FOREIGN KEY (id_usuario) REFERENCES usuario (id),
     FOREIGN KEY (id_home) REFERENCES home (id)
-)
+);

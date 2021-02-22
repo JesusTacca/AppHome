@@ -1,7 +1,117 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import *
 from PyQt5.QtCore import pyqtSlot
-from PyQt5 import QSQLITE
+from PyQt5 import QtSql 
+import sqlite3
+def sql_connection():
+    try:
+        con = sqlite3.connect('Database/mydatabase.db')
+        return con
+    except Error:
+        print(Error)
+
+def Home(this):
+    #Insert
+    this.label_01 = QLabel(this)
+    this.label_01.setText('Name')
+    this.label_01.move(50,30)
+    this.Edit_01 = QLineEdit(this)
+    this.Edit_01.move(120,30)
+    this.Edit_01.resize(120,30)
+
+    this.label_02 = QLabel(this)
+    this.label_02.setText("Surname")
+    this.label_02.move(50,80)
+    this.Edit_02 = QLineEdit(this)
+    this.Edit_02.move(120,80)
+    this.Edit_02.resize(120,30)
+
+    this.label_03= QLabel(this)
+    this.label_03.setText("DNI")
+    this.label_03.move(50,130)
+    this.Edit_03 = QLineEdit(this)
+    this.Edit_03.setValidator(QIntValidator(10000000,99999999))
+    this.Edit_03.move(120,130)
+    this.Edit_03.resize(120,30)
+
+    this.label_04 = QLabel(this)
+    this.label_04.setText("Money")
+    this.label_04.move(50,180)
+    this.Edit_04 = QLineEdit(this)
+    this.Edit_04.setValidator(QDoubleValidator(0.0,99999999,2))
+    this.Edit_04.move(120,180)
+    this.Edit_04.resize(120,30)
+
+    this.label_05 = QLabel(this)
+    this.label_05.setText("Email")
+    this.label_05.move(350,30)
+    this.Edit_05 = QLineEdit(this)
+    this.Edit_05.move(450,30)
+    this.Edit_05.resize(120,30)
+
+    this.label_06 = QLabel(this)
+    this.label_06.setText("Fecha de Nacimiento")
+    this.label_06.move(350,80)
+    this.label_06_1 = QLabel(this)
+    this.label_06_1.setText("/")
+    this.label_06_1.move(481,80)
+    this.label_06_1.setFont(QFont("Arial",20))
+    this.label_06_2 = QLabel(this)
+    this.label_06_2.setText("/")
+    this.label_06_2.move(521,80)
+    this.label_06_2.setFont(QFont("Arial",20))
+    this.Edit_06_1 = QLineEdit(this)
+    this.Edit_06_1.move(450,80)
+    this.Edit_06_1.resize(30,30)
+    this.Edit_06_1.setValidator(QIntValidator(1,31))
+    this.Edit_06_2 = QLineEdit(this)
+    this.Edit_06_2.move(490,80)
+    this.Edit_06_2.resize(30,30)
+    this.Edit_06_2.setValidator(QIntValidator(1,12))
+    this.Edit_06_3 = QLineEdit(this)
+    this.Edit_06_3.move(530,80)
+    this.Edit_06_3.resize(60,30)
+    this.Edit_06_3.setValidator(QIntValidator())
+    this.Edit_06_3.setMaxLength(4)
+
+    this.label_07 = QLabel(this)
+    this.label_07.setText("Numero")
+    this.label_07.move(350,130)
+    this.Edit_07 = QLineEdit(this)
+    this.Edit_07.setValidator(QIntValidator(100000000,999999999))
+    this.Edit_07.move(450,130)
+    this.Edit_07.resize(120,30)
+
+    this.label_08 = QLabel(this)
+    this.label_08.setText("Contraseña")
+    this.label_08.move(350,180)
+    this.Edit_08 = QLineEdit(this)
+    this.Edit_08.setEchoMode(QLineEdit.Password)
+    this.Edit_08.move(450,180)
+    this.Edit_08.resize(120,30)
+
+    this.button = QPushButton('Agregar', this)
+    this.button.move(600,100)
+    this.button.resize(100,30)
+    this.button.clicked.connect(this.Insert_User)
+    #Table
+    this.cur.execute("SELECT * FROM usuario")
+    rows = this.cur.fetchall()
+    print(rows)
+    m = 0
+    if len(rows)!=0:
+        m = len(rows)
+    print(m)
+    this.tableWidget = QTableWidget(m,9)
+    this.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+    info = []
+    for i, a in enumerate(rows):
+        for j, b in enumerate(a):
+            this.tableWidget.setItem(i,j,QTableWidgetItem(str(b)))
+    this.tableWidget.move(0,0)
+    this.layout = QVBoxLayout()
+    this.layout.addWidget(this.tableWidget) 
+    this.main_widget.setLayout(this.layout)
 
 class App(QMainWindow):
  
@@ -9,47 +119,54 @@ class App(QMainWindow):
         super().__init__()
 
         self.title = 'App Home'
-        self.left = 50
+        self.left = 300
         self.top = 50
-        self.width = 1250
+        self.width = 750
         self.height = 650
         self.initUI()
- 
+
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
+        self.main_widget = QWidget(self)
+        self.main_widget.setContentsMargins(50, 200, 0, 0)
+        self.main_widget.setFixedSize(700, 600)
+        self.setCentralWidget(self.main_widget)
+        # Database
+        self.con = sql_connection()
+        self.cur = self.con.cursor()
         # Menu bar
+        #  Exit
+        exitAction = QAction('&Exit', self)        
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(qApp.quit)
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+        fileMenu.addAction(exitAction)
+        #  Home
+        Home(self)
+        #  Insert User
 
-        # Crear cuadro de texto
-        self.textbox = QTextEdit(self)
-        self.textbox.move(20, 20)
-        self.textbox.resize(460,150)
-        
-        self.tb = QTextBrowser(self)
-        self.tb.move(20, 260)
-        self.tb.resize(460,150)
+        #  Delete User
 
-        self.actual = 0
+        #  Update User
 
-        self.button = QPushButton('Vamos!', self)
-        self.button.move(280,200)
-        self.button.resize(200,30)
-
-        self.cb = QComboBox(self)
-        self.cb.move(20,200)
-        self.cb.resize(200,30)
-        self.cb.addItems(["MD4", "MD5", "SHA1", "SHA3 (224)", 
-                        "SHA3 (256)", "SHA3 (384)", "SHA3 (512)", 
-                        "SHA224", "SHA256", "SHA384", "SHA512", 
-                        "RIPE Hash MD160", "BASE64(Codificar)", 
-                        "BASE64(Decodificar)"])
-        self.cb.currentIndexChanged.connect(self.selectionchange)
-        
-        self.button.clicked.connect(self.on_click)
+        self.statusBar()
         self.show()
-    def selectionchange(self,i):
-        self.actual = i
     @pyqtSlot()
-    def on_click(self):
-        textboxValue = self.textbox.toPlainText()
-        self.tb.setText(textboxValue)
+    def Insert_User(self):
+        txt = "insert into usuario(name, surname, DNI, money, email, fecha_nacimiento, numero, contrasena) values ('"+self.Edit_01.text()+"','"+self.Edit_02.text()+"',"+self.Edit_03.text()+","+self.Edit_04.text()+",'"+self.Edit_05.text()+"','"+self.Edit_06_1.text()+'/'+self.Edit_06_2.text()+'/'+self.Edit_06_3.text()+"',"+self.Edit_07.text()+",'"+self.Edit_08.text()+"')"
+        self.cur.execute(txt)
+        self.con.commit()
+        temp=self.tableWidget.rowCount()
+        self.tableWidget.insertRow(temp)
+        self.tableWidget.setItem(temp,0,QTableWidgetItem(str(temp+1)))
+        self.tableWidget.setItem(temp,1,QTableWidgetItem(self.Edit_01.text()))
+        self.tableWidget.setItem(temp,2,QTableWidgetItem(self.Edit_02.text()))
+        self.tableWidget.setItem(temp,3,QTableWidgetItem(self.Edit_03.text()))
+        self.tableWidget.setItem(temp,4,QTableWidgetItem(self.Edit_04.text()))
+        self.tableWidget.setItem(temp,5,QTableWidgetItem(self.Edit_05.text()))
+        self.tableWidget.setItem(temp,6,QTableWidgetItem(self.Edit_06_1.text()+'/'+self.Edit_06_2.text()+'/'+self.Edit_06_3.text()))
+        self.tableWidget.setItem(temp,7,QTableWidgetItem(self.Edit_07.text()))
+        self.tableWidget.setItem(temp,8,QTableWidgetItem(self.Edit_08.text()))
